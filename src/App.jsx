@@ -14,7 +14,19 @@ function App() {
   const [direction, setDirection] = useState('desc')
 
   const backend = useMemo(() => {
-    return import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
+    const envUrl = import.meta.env.VITE_BACKEND_URL
+    if (envUrl) return envUrl
+    try {
+      const origin = window.location.origin
+      // If frontend is on :3000, use same host on :8000 for backend
+      if (origin.includes(':3000')) {
+        return origin.replace(':3000', ':8000')
+      }
+      // Fallback to localhost for local dev
+      return 'http://localhost:8000'
+    } catch {
+      return 'http://localhost:8000'
+    }
   }, [])
 
   useEffect(() => {
